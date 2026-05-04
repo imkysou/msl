@@ -16,8 +16,9 @@
 ### 安装
 
 ```bash
-git clone https://github.com/your-username/MinecraftServerListener.git
+git clone https://github.com/imkysou/MinecraftServerListener.git
 cd MinecraftServerListener
+npm install
 ```
 
 ### 配置
