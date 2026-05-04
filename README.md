@@ -16,8 +16,8 @@
 ### 安装
 
 ```bash
-git clone https://github.com/imkysou/MinecraftServerListener.git
-cd MinecraftServerListener
+git clone https://github.com/imkysou/msl.git
+cd msl
 npm install
 ```
 
