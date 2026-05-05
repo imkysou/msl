@@ -51,6 +51,8 @@ function parseLogLine(line) {
 
     if (!pluginsLoader.isLoaded()) return;
 
+    libs.plugin_triggerEvent('serverLog', line);
+
     const regexs = config.minecraft.logRegexs;
     
     let match = line.match(regexs.playerJoin);

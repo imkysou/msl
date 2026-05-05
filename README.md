@@ -101,6 +101,7 @@ Content-Type: application/json
 
 | 事件 | 参数 |
 |------|------|
+| `serverLog` | line (完整日志行) |
 | `playerJoin` | time, player |
 | `playerQuit` | time, player |
 | `playerSendMessage` | time, player, message |

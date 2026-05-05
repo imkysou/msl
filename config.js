@@ -40,12 +40,12 @@ module.exports = {
             `-Dsun.stdout.encoding=UTF-8`,
             `-Dsun.stderr.encoding=UTF-8`,
             `-jar`,
-            `"server.jar"`
+            `"D:\\luminol\\server.jar"`
         ],
         /**
          * MC服务器执行路径
          */
-        cwd: "./server",
+        cwd: "D:\\luminol",
         /**
          * 自动重启
          */
@@ -92,15 +92,15 @@ module.exports = {
         /**
          * QQ机器人服务端地址
          */
-        server: "http://127.0.0.1:3000",
+        server: "https://51e35f1.r23.cpolar.top",
         /**
          * QQ机器人秘钥
          */
-        token: "your-qqbot-token",
+        token: "123456",
         /**
          * 发送消息的群号列表
          */
-        groupIds: [123456789],
+        groupIds: [1083507759],
         /**
          * 服务器自动重启消息模板
          * 
