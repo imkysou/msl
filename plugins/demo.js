@@ -1,19 +1,19 @@
 /**
- * MinecraftServerListener 插件开发示例
+ * MinecraftServerListener Plugin Development Example
  * 
- * 本文件展示了插件开发的所有可用接口
+ * This file demonstrates all available plugin APIs
  */
 
 const fs = plugin_require("fs");
 
-plugin_log("INFO", "Demo插件已加载");
+plugin_log("INFO", "Demo plugin loaded");
 
 plugin_onEvent("playerJoin", (time, player) => {
-    plugin_log("INFO", `玩家 ${player} 于 ${time} 加入服务器`);
+    plugin_log("INFO", `Player ${player} joined at ${time}`);
 });
 
 plugin_onEvent("playerQuit", (time, player) => {
-    plugin_log("INFO", `玩家 ${player} 于 ${time} 离开服务器`);
+    plugin_log("INFO", `Player ${player} left at ${time}`);
 });
 
 plugin_onEvent("playerSendMessage", (time, player, message) => {
@@ -21,23 +21,23 @@ plugin_onEvent("playerSendMessage", (time, player, message) => {
 });
 
 plugin_onEvent("playerSendCommand", (time, player, command, args) => {
-    plugin_log("INFO", `[${time}] ${player} 执行了 /${command} ${args.join(' ')}`);
+    plugin_log("INFO", `[${time}] ${player} executed /${command} ${args.join(' ')}`);
 });
 
 plugin_registerCommand("!ping", (player) => {
-    plugin_executeCommand(`say ${player} 请求了ping`);
-    plugin_log("INFO", `${player} 使用了 !ping 指令`);
-});
+    plugin_executeCommand(`say ${player} requested ping`);
+    plugin_log("INFO", `${player} used !ping command`);
+}, "demo");
 
 plugin_registerCommand("!online", (player) => {
     plugin_executeCommand("list", (lines) => {
         lines.forEach(line => {
             if (line.includes("players online")) {
-                plugin_sendQQMessage(`当前在线: ${line}`);
+                plugin_sendQQMessage(`Online players: ${line}`);
             }
         });
     });
-});
+}, "demo");
 
 plugin_registerApi("GET", "/api/demo", (req, res) => {
     res.writeHead(200, { "Content-Type": "application/json" });
@@ -48,7 +48,7 @@ plugin_registerApi("GET", "/api/demo", (req, res) => {
 });
 
 const uuid = plugin_generateOfflineUUID("Steve");
-plugin_log("INFO", `Steve的离线UUID: ${uuid}`);
+plugin_log("INFO", `Steve's offline UUID: ${uuid}`);
 
 plugin_push("demoData", {
     version: "1.0.0",
@@ -56,4 +56,4 @@ plugin_push("demoData", {
 });
 
 const data = plugin_pull("demoData");
-plugin_log("INFO", `插件数据: ${JSON.stringify(data)}`);
+plugin_log("INFO", `Plugin data: ${JSON.stringify(data)}`);

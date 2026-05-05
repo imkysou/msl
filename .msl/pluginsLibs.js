@@ -1,12 +1,21 @@
 const crypto = require('crypto');
 const http = require('http');
 const https = require('https');
-const config = require('./config');
+const config = require('../config');
 
 const globalStore = {};
 const eventListeners = {};
 const registeredCommands = [];
 const registeredApis = [];
+let debugEnabled = config.debug;
+
+function setDebug(value) {
+    debugEnabled = value;
+}
+
+function isDebugEnabled() {
+    return debugEnabled;
+}
 
 function getTimestamp() {
     const now = new Date();
@@ -17,7 +26,7 @@ function getTimestamp() {
 }
 
 function debugLog(message) {
-    if (config.debug) {
+    if (debugEnabled) {
         console.log(`[${getTimestamp()} INFO]: [MinecraftServerListener] ${message}`);
     }
 }
@@ -38,7 +47,7 @@ function plugin_executeCommand(command, fn) {
     }
 }
 
-function plugin_registerCommand(expression, fn) {
+function plugin_registerCommand(expression, fn, pluginName) {
     debugLog(`plugin_registerCommand('${expression}')`);
     const parts = expression.split(' ');
     const prefix = parts[0].charAt(0);
@@ -55,7 +64,8 @@ function plugin_registerCommand(expression, fn) {
         commandName,
         paramNames,
         fullExpression: expression,
-        fn
+        fn,
+        pluginName
     });
 }
 
@@ -69,18 +79,20 @@ function plugin_pull(key) {
     return globalStore[key];
 }
 
-function plugin_onEvent(eventName, fn) {
+function plugin_onEvent(eventName, fn, pluginName) {
     debugLog(`plugin_onEvent('${eventName}')`);
     if (!eventListeners[eventName]) {
         eventListeners[eventName] = [];
     }
-    eventListeners[eventName].push(fn);
+    eventListeners[eventName].push({ fn, pluginName });
 }
 
 function plugin_triggerEvent(eventName, ...args) {
-    debugLog(`plugin_triggerEvent('${eventName}', ${args.join(', ')})`);
+    if (eventName !== 'serverLog') {
+        debugLog(`plugin_triggerEvent('${eventName}', ${args.join(', ')})`);
+    }
     if (eventListeners[eventName]) {
-        eventListeners[eventName].forEach(fn => fn(...args));
+        eventListeners[eventName].forEach(entry => entry.fn(...args));
     }
 }
 
@@ -93,9 +105,9 @@ function plugin_generateOfflineUUID(playerName) {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-function plugin_registerApi(method, path, fn) {
+function plugin_registerApi(method, path, fn, pluginName) {
     debugLog(`plugin_registerApi('${method}', '${path}')`);
-    registeredApis.push({ method: method.toUpperCase(), path, fn });
+    registeredApis.push({ method: method.toUpperCase(), path, fn, pluginName });
 }
 
 function plugin_log(type, message, pluginName) {
@@ -148,17 +160,17 @@ function matchCommand(prefix, playerName, content) {
 
 function plugin_sendQQMessage(text) {
     debugLog(`plugin_sendQQMessage('${text}')`);
-    
+
     const qqbot = config.qqbot;
     const url = new URL(qqbot.server);
     const isHttps = url.protocol === 'https:';
     const requestLib = isHttps ? https : http;
-    
+
     const postData = JSON.stringify({
         group_id: qqbot.groupIds[0],
         message: text
     });
-    
+
     const options = {
         hostname: url.hostname,
         port: url.port || (isHttps ? 443 : 80),
@@ -170,21 +182,40 @@ function plugin_sendQQMessage(text) {
             'Authorization': `Bearer ${qqbot.token}`
         }
     };
-    
+
     const req = requestLib.request(options, (res) => {
         let data = '';
         res.on('data', (chunk) => { data += chunk; });
         res.on('end', () => {
-            debugLog(`QQ消息发送响应: ${data}`);
+            debugLog(`QQ message response: ${data}`);
         });
     });
-    
+
     req.on('error', (err) => {
-        debugLog(`QQ消息发送失败: ${err.message}`);
+        debugLog(`QQ message failed: ${err.message}`);
     });
-    
+
     req.write(postData);
     req.end();
+}
+
+function clearPlugin(pluginName) {
+    for (const key in eventListeners) {
+        eventListeners[key] = eventListeners[key].filter(entry => entry.pluginName !== pluginName);
+        if (eventListeners[key].length === 0) {
+            delete eventListeners[key];
+        }
+    }
+    for (let i = registeredCommands.length - 1; i >= 0; i--) {
+        if (registeredCommands[i].pluginName === pluginName) {
+            registeredCommands.splice(i, 1);
+        }
+    }
+    for (let i = registeredApis.length - 1; i >= 0; i--) {
+        if (registeredApis[i].pluginName === pluginName) {
+            registeredApis.splice(i, 1);
+        }
+    }
 }
 
 function clearAll() {
@@ -196,6 +227,14 @@ function clearAll() {
     for (const key in globalStore) {
         delete globalStore[key];
     }
+}
+
+function plugin_getPluginsList() {
+    debugLog('plugin_getPluginsList()');
+    if (module.exports._getPluginsList) {
+        return module.exports._getPluginsList();
+    }
+    return { loaded: [], unloaded: [], all: [] };
 }
 
 module.exports = {
@@ -211,8 +250,13 @@ module.exports = {
     plugin_log,
     plugin_sendQQMessage,
     matchCommand,
+    clearPlugin,
     clearAll,
+    plugin_getPluginsList,
+    setDebug,
+    isDebugEnabled,
     getRegisteredApis: () => registeredApis,
     getEventListeners: () => eventListeners,
-    sendCommand: null
+    sendCommand: null,
+    _getPluginsList: null
 };

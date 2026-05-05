@@ -30,6 +30,6 @@ module.exports = {
         server: "http://127.0.0.1:3000",
         token: "your-qqbot-token",
         groupIds: [123456789],
-        autoRestartMessage: "服务器已于 {time} 自动重启"
+        autoRestartMessage: "Server auto-restarted at {time}"
     }
 }

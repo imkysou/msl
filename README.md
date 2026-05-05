@@ -1,19 +1,21 @@
 # MinecraftServerListener
 
-一个基于 Node.js 的 Minecraft 服务器管理工具，支持插件系统、HTTP API 和 QQ 机器人消息推送。
+English | [中文](./README_CN.md)
 
-## 功能特性
+A Node.js-based Minecraft server management tool with plugin system, HTTP API, and QQ bot integration.
 
-- 🎮 **服务器管理** - 启动、监控、自动重启 Minecraft 服务器
-- 🔌 **插件系统** - 支持自定义插件扩展功能
-- 🌐 **HTTP API** - 提供 RESTful API 接口远程控制服务器
-- 🤖 **QQ 机器人** - 支持 OneBot11 协议，可发送消息到 QQ 群
-- 📝 **日志解析** - 自动解析玩家加入、退出、消息、指令等事件
-- 🔄 **热加载** - 支持运行时重载插件
+## Features
 
-## 快速开始
+- 🎮 **Server Management** - Start, monitor, and auto-restart Minecraft server
+- 🔌 **Plugin System** - Custom plugin extensions with single-plugin management
+- 🌐 **HTTP API** - RESTful API for remote server control
+- 🤖 **QQ Bot** - OneBot11 protocol support for QQ group messaging
+- 📝 **Log Parsing** - Auto-parse player join, quit, message, and command events
+- 🔄 **Hot Reload** - Runtime plugin reloading
 
-### 安装
+## Quick Start
+
+### Installation
 
 ```bash
 git clone https://github.com/imkysou/msl.git
@@ -21,9 +23,15 @@ cd msl
 npm install
 ```
 
-### 配置
+### Configuration
 
-编辑 `config.js` 文件，配置你的服务器信息：
+Copy `config.example.js` to `config.js` and modify:
+
+```bash
+cp config.example.js config.js
+```
+
+Edit `config.js` with your server settings:
 
 ```javascript
 module.exports = {
@@ -45,27 +53,38 @@ module.exports = {
 }
 ```
 
-### 运行
+### Run
 
 ```bash
 node index.js
 ```
 
-## 控制台指令
+## Console Commands
 
-在 Node.js 控制台中输入以下指令：
+Type the following commands in the Node.js console:
 
-| 指令 | 说明 |
-|------|------|
-| `msl reload` | 重载所有插件 |
-| `msl disable_plugins` | 禁用所有插件 |
-| `msl enable_plugins` | 启用所有插件 |
-| `msl disable_http` | 禁用 HTTP 服务 |
-| `msl enable_http` | 启用 HTTP 服务 |
+| Command | Description |
+|---------|-------------|
+| `msl` | Show help message |
+| `msl help` | Show help message |
+| `msl version` | Show MSL version |
+| `msl reload` | Reload all plugins |
+| `msl stopmc` | Stop Minecraft server |
+| `msl startmc` | Start Minecraft server |
+| `msl disable_plugin all` | Unload all plugins |
+| `msl disable_plugin <name>` | Unload specified plugin |
+| `msl enable_plugin all` | Load all plugins |
+| `msl enable_plugin <name>` | Load specified plugin |
+| `msl list_plugins` | List all plugins with status |
+| `msl debug on` | Enable debug mode |
+| `msl debug off` | Disable debug mode |
+| `msl debug` | Show current debug status |
+| `msl disable_http` | Disable HTTP service |
+| `msl enable_http` | Enable HTTP service |
 
 ## HTTP API
 
-### 执行指令
+### Execute Command
 
 ```http
 POST /execCommand
@@ -77,45 +96,57 @@ Content-Type: application/json
 }
 ```
 
-## 插件开发
+## Plugin Development
 
-在 `plugins` 目录下创建 `.js` 文件即可开发插件。
+Create a `.js` file in the `plugins` directory. Plugins are auto-loaded on startup.
 
-### 可用接口
+### Available APIs
 
-| 接口 | 说明 |
-|------|------|
-| `plugin_require(moduleName)` | 导入 Node.js 模块 |
-| `plugin_executeCommand(command, fn?)` | 执行 MC 指令（可选回调获取响应） |
-| `plugin_registerCommand(expr, fn)` | 注册自定义指令 |
-| `plugin_onEvent(event, fn)` | 监听事件 |
-| `plugin_triggerEvent(event, ...args)` | 触发事件 |
-| `plugin_sendQQMessage(text)` | 发送 QQ 群消息 |
-| `plugin_log(type, message)` | 输出日志 (INFO/WARN/ERROR) |
-| `plugin_generateOfflineUUID(name)` | 生成离线 UUID |
-| `plugin_registerApi(method, path, fn)` | 注册 HTTP 接口 |
-| `plugin_push(key, value)` | 存储全局数据 |
-| `plugin_pull(key)` | 获取全局数据 |
+| API | Description |
+|-----|-------------|
+| `plugin_require(moduleName)` | Import Node.js module |
+| `plugin_executeCommand(command, fn?)` | Execute MC command (optional callback for response) |
+| `plugin_registerCommand(expr, fn)` | Register custom command |
+| `plugin_onEvent(event, fn)` | Listen to event |
+| `plugin_triggerEvent(event, ...args)` | Trigger custom event |
+| `plugin_sendQQMessage(text)` | Send QQ group message |
+| `plugin_log(type, message)` | Log output (INFO/WARN/ERROR) |
+| `plugin_generateOfflineUUID(name)` | Generate offline UUID |
+| `plugin_registerApi(method, path, fn)` | Register HTTP endpoint |
+| `plugin_push(key, value)` | Store global data |
+| `plugin_pull(key)` | Retrieve global data |
+| `plugin_getPluginsList()` | Get plugin lists `{loaded, unloaded, all}` |
 
-### 原生事件
+### Native Events
 
-| 事件 | 参数 |
-|------|------|
-| `serverLog` | line (完整日志行) |
-| `playerJoin` | time, player |
-| `playerQuit` | time, player |
-| `playerSendMessage` | time, player, message |
-| `playerSendCommand` | time, player, command, args |
+| Event | Parameters | Description |
+|-------|-----------|-------------|
+| `serverLog` | line | Every server log line |
+| `serverDone` | (none) | Server startup complete |
+| `playerJoin` | time, player | Player joined |
+| `playerQuit` | time, player | Player left |
+| `playerSendMessage` | time, player, message | Player sent chat message |
+| `playerSendCommand` | time, player, command, args | Player executed command |
 
-### 示例插件
+### Example Plugin
 
 ```javascript
+plugin_onEvent("serverDone", () => {
+    plugin_log("INFO", "Server started!");
+});
+
 plugin_onEvent("playerJoin", (time, player) => {
-    plugin_log("INFO", `玩家 ${player} 加入了服务器`);
+    plugin_log("INFO", `Player ${player} joined`);
+});
+
+plugin_onEvent("serverLog", (line) => {
+    if (line.includes("WARN")) {
+        plugin_log("WARN", `Warning detected: ${line}`);
+    }
 });
 
 plugin_registerCommand("!ping", (player) => {
-    plugin_executeCommand(`say ${player} 请求了ping`);
+    plugin_executeCommand(`say ${player} requested ping`);
 });
 
 plugin_registerApi("GET", "/api/hello", (req, res) => {
@@ -124,19 +155,23 @@ plugin_registerApi("GET", "/api/hello", (req, res) => {
 });
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 MinecraftServerListener/
-├── index.js          # 主程序入口
-├── config.js         # 配置文件
-├── pluginsLoader.js  # 插件加载器
-├── pluginsLibs.js    # 插件接口库
-├── plugins/          # 插件目录
-│   └── demo.js       # 示例插件
+├── index.js            # Main entry point
+├── config.js           # Configuration (create yourself)
+├── config.example.js   # Configuration template
+├── .msl/
+│   ├── pluginsLibs.js  # Plugin API library
+│   ├── pluginsLoader.js# Plugin loader
+│   └── MSL_VERSION     # Version file
+├── plugins/            # Plugin directory
+│   └── demo.js         # Example plugin
+├── CLAUDE.md           # AI development docs
 └── package.json
 ```
 
-## 许可证
+## License
 
 MIT License
