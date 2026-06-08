@@ -35,6 +35,17 @@ let commandResponseCapture = null;
 
 libs._getPluginsList = pluginsLoader.getPluginsList;
 
+libs.startServer = function() {
+    startMinecraftServer();
+};
+
+libs.forceStopServer = function() {
+    if (minecraftProcess) {
+        minecraftProcess.kill('SIGKILL');
+        log('Minecraft server process force killed');
+    }
+};
+
 libs.sendCommand = function(command, fn) {
     if (minecraftProcess && minecraftProcess.stdin.writable) {
         if (fn) {
@@ -126,6 +137,8 @@ function startMinecraftServer() {
         cwd: config.minecraft.cwd
     });
 
+    libs.plugin_triggerEvent('serverStart');
+
     minecraftProcess.stdout.on('data', (data) => {
         process.stdout.write(data);
 
@@ -149,6 +162,7 @@ function startMinecraftServer() {
 
     minecraftProcess.on('close', (code) => {
         log(`Minecraft server process exited with code: ${code}`);
+        libs.plugin_triggerEvent('serverStop');
         minecraftProcess = null;
 
         if (!manualStop && config.minecraft.autoRestart.enable) {

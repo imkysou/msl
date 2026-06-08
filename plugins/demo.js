@@ -8,6 +8,14 @@ const fs = plugin_require("fs");
 
 plugin_log("INFO", "Demo plugin loaded");
 
+plugin_onEvent("serverStart", () => {
+    plugin_log("INFO", "Server process started");
+});
+
+plugin_onEvent("serverStop", () => {
+    plugin_log("INFO", "Server process stopped");
+});
+
 plugin_onEvent("playerJoin", (time, player) => {
     plugin_log("INFO", `Player ${player} joined at ${time}`);
 });

@@ -99,6 +99,8 @@ Content-Type: application/json
 |------|------|
 | `plugin_require(moduleName)` | 导入 Node.js 模块 |
 | `plugin_executeCommand(command, fn?)` | 执行 MC 指令（可选回调获取响应） |
+| `plugin_startServer()` | 启动 Minecraft 服务器 |
+| `plugin_forceStopServer()` | 强制杀死 Minecraft 服务器进程 |
 | `plugin_registerCommand(expr, fn)` | 注册自定义指令 |
 | `plugin_onEvent(event, fn)` | 监听事件 |
 | `plugin_triggerEvent(event, ...args)` | 触发事件 |
@@ -115,6 +117,8 @@ Content-Type: application/json
 | 事件 | 参数 | 说明 |
 |------|------|------|
 | `serverLog` | line | 服务器输出的每一行日志 |
+| `serverStart` | (无) | 服务器进程启动 |
+| `serverStop` | (无) | 服务器进程退出 |
 | `serverDone` | (无) | 服务器启动完成 |
 | `playerJoin` | time, player | 玩家加入服务器 |
 | `playerQuit` | time, player | 玩家退出服务器 |

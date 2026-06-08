@@ -99,6 +99,8 @@ Create a `.js` file in the `plugins` directory. Plugins are auto-loaded on start
 |-----|-------------|
 | `plugin_require(moduleName)` | Import Node.js module |
 | `plugin_executeCommand(command, fn?)` | Execute MC command (optional callback for response) |
+| `plugin_startServer()` | Start Minecraft server |
+| `plugin_forceStopServer()` | Force kill Minecraft server process |
 | `plugin_registerCommand(expr, fn)` | Register custom command |
 | `plugin_onEvent(event, fn)` | Listen to event |
 | `plugin_triggerEvent(event, ...args)` | Trigger custom event |
@@ -115,6 +117,8 @@ Create a `.js` file in the `plugins` directory. Plugins are auto-loaded on start
 | Event | Parameters | Description |
 |-------|-----------|-------------|
 | `serverLog` | line | Every server log line |
+| `serverStart` | (none) | Server process started |
+| `serverStop` | (none) | Server process stopped |
 | `serverDone` | (none) | Server startup complete |
 | `playerJoin` | time, player | Player joined |
 | `playerQuit` | time, player | Player left |

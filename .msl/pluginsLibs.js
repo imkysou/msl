@@ -46,6 +46,20 @@ function plugin_executeCommand(command, fn) {
     }
 }
 
+function plugin_startServer() {
+    debugLog('plugin_startServer()');
+    if (module.exports.startServer) {
+        module.exports.startServer();
+    }
+}
+
+function plugin_forceStopServer() {
+    debugLog('plugin_forceStopServer()');
+    if (module.exports.forceStopServer) {
+        module.exports.forceStopServer();
+    }
+}
+
 function plugin_registerCommand(expression, fn, pluginName) {
     debugLog(`plugin_registerCommand('${expression}')`);
     const parts = expression.split(' ');
@@ -242,6 +256,8 @@ function _clearPluginTimers(pluginName) {
 module.exports = {
     plugin_require,
     plugin_executeCommand,
+    plugin_startServer,
+    plugin_forceStopServer,
     plugin_registerCommand,
     plugin_push,
     plugin_pull,
@@ -260,6 +276,8 @@ module.exports = {
     getRegisteredApis: () => registeredApis,
     getEventListeners: () => eventListeners,
     sendCommand: null,
+    startServer: null,
+    forceStopServer: null,
     _getPluginsList: null,
     _addPluginTimer,
     _removePluginTimer,

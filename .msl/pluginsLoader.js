@@ -49,6 +49,8 @@ function loadPlugin(pluginName) {
             plugin_log: (type, message) => libs.plugin_log(type, message, pluginName),
             plugin_sendQQMessage: libs.plugin_sendQQMessage,
             plugin_getPluginsList: libs.plugin_getPluginsList,
+            plugin_startServer: libs.plugin_startServer,
+            plugin_forceStopServer: libs.plugin_forceStopServer,
             setTimeout: (fn, delay, ...args) => {
                 const id = setTimeout(() => {
                     libs._removePluginTimer(pluginName, id);
