@@ -20,7 +20,6 @@
 ```bash
 git clone https://github.com/imkysou/msl.git
 cd msl
-npm install
 ```
 
 ### 配置

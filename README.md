@@ -20,7 +20,6 @@ A Node.js-based Minecraft server management tool with plugin system, HTTP API, a
 ```bash
 git clone https://github.com/imkysou/msl.git
 cd msl
-npm install
 ```
 
 ### Configuration
