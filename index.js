@@ -43,7 +43,11 @@ libs.sendCommand = function(command, fn) {
                 callback: fn,
                 timer: setTimeout(() => {
                     if (commandResponseCapture) {
-                        commandResponseCapture.callback(commandResponseCapture.lines);
+                        try {
+                            commandResponseCapture.callback(commandResponseCapture.lines);
+                        } catch (err) {
+                            log(`Plugin command callback error: ${err.message}`);
+                        }
                         commandResponseCapture = null;
                     }
                 }, 500)
@@ -293,7 +297,13 @@ function handlePluginApis(req, res) {
     const apis = libs.getRegisteredApis();
     for (const api of apis) {
         if (api.method === req.method && req.url === api.path) {
-            api.fn(req, res);
+            try {
+                api.fn(req, res);
+            } catch (err) {
+                log(`Plugin API '${api.path}' error in plugin '${api.pluginName}': ${err.message}`);
+                res.writeHead(500, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: 'Internal plugin error' }));
+            }
             return true;
         }
     }

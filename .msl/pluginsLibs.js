@@ -92,7 +92,13 @@ function plugin_triggerEvent(eventName, ...args) {
         debugLog(`plugin_triggerEvent('${eventName}', ${args.join(', ')})`);
     }
     if (eventListeners[eventName]) {
-        eventListeners[eventName].forEach(entry => entry.fn(...args));
+        eventListeners[eventName].forEach(entry => {
+            try {
+                entry.fn(...args);
+            } catch (err) {
+                plugin_log('ERROR', `Event '${eventName}' handler error in plugin '${entry.pluginName}': ${err.message}`, entry.pluginName);
+            }
+        });
     }
 }
 
@@ -152,7 +158,11 @@ function matchCommand(prefix, playerName, content) {
         if (!valid) continue;
 
         debugLog(`Command matched: ${cmd.fullExpression}, player: ${playerName}, args: ${JSON.stringify(paramValues)}`);
-        cmd.fn(playerName, ...paramValues);
+        try {
+            cmd.fn(playerName, ...paramValues);
+        } catch (err) {
+            plugin_log('ERROR', `Command '${cmd.fullExpression}' handler error in plugin '${cmd.pluginName}': ${err.message}`, cmd.pluginName);
+        }
         return true;
     }
     return false;
