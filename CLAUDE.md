@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-MSL is a Node.js-based Minecraft server management tool with plugin system, HTTP API, and QQ bot integration.
+MSL is a Node.js-based Minecraft server management tool with plugin system and HTTP API.
 
 ## Architecture
 
@@ -14,7 +14,7 @@ MinecraftServerListener/
 ├── .msl/
 │   ├── pluginsLibs.js  # Plugin API library (all plugin_* functions)
 │   ├── pluginsLoader.js# Plugin loader/unloader (single & batch management)
-│   └── MSL_VERSION     # Version file (e.g. "1.0.0")
+│   └── MSL_VERSION     # Version file (e.g. "1.1.0")
 ├── plugins/            # User plugins directory
 │   └── demo.js         # Example plugin
 └── package.json
@@ -24,9 +24,11 @@ MinecraftServerListener/
 
 - Plugins are loaded at program startup, NOT after "Done" message
 - Plugins run in a sandbox with `plugin_*` functions injected
-- Each plugin's registrations (events, commands, APIs) are tracked by pluginName for single-plugin unload
+- Each plugin's registrations (events, commands, APIs, timers) are tracked by pluginName for single-plugin unload
 - The `serverLog` event is excluded from debug logging to avoid spam
 - The `/` prefix command matching requires the `/` to be prepended before calling `matchCommand`
+- Plugin errors in event handlers, command handlers, API handlers, and command callbacks are caught with try-catch to prevent crashes
+- `setTimeout`/`setInterval` in plugins are wrapped to track timer IDs per plugin; they are auto-cleared on plugin unload
 
 ## Log Format Standard
 
@@ -57,7 +59,7 @@ All `plugin_*` functions are injected into the plugin sandbox. Plugins do NOT ne
 | `plugin_registerCommand` | `(expression, fn) => void` | Register command: `"!ping"` or `"!ban <player> <reason>"` |
 | `plugin_onEvent` | `(eventName, fn) => void` | Listen to event |
 | `plugin_triggerEvent` | `(eventName, ...args) => void` | Trigger custom event |
-| `plugin_sendQQMessage` | `(text) => void` | Send QQ group message (OneBot11) |
+| `plugin_sendQQMessage` | `(text) => void` | **DEPRECATED since v1.1.0** - No longer functional, logs a warning |
 | `plugin_log` | `(type, message) => void` | Log: INFO/WARN/ERROR |
 | `plugin_generateOfflineUUID` | `(name) => string` | Generate offline UUID |
 | `plugin_registerApi` | `(method, path, fn) => void` | Register HTTP API endpoint |
@@ -102,7 +104,6 @@ Key sections:
 - `minecraft.cwd` - Server working directory
 - `minecraft.autoRestart` - Auto restart on crash
 - `minecraft.logRegexs` - Regex patterns for log parsing
-- `qqbot` - OneBot11 QQ bot configuration
 
 ## Important Notes
 
@@ -112,3 +113,4 @@ Key sections:
 - Command matching is strict: number of parts must match exactly
 - `plugin_executeCommand` with callback captures 500ms of server response
 - `manualStop` flag prevents auto-restart when server is stopped via `msl stopmc`
+- `plugin_sendQQMessage` is deprecated since v1.1.0 and will be removed in a future version

@@ -2,14 +2,13 @@
 
 English | [中文](./README_CN.md)
 
-A Node.js-based Minecraft server management tool with plugin system, HTTP API, and QQ bot integration.
+A Node.js-based Minecraft server management tool with plugin system and HTTP API.
 
 ## Features
 
 - 🎮 **Server Management** - Start, monitor, and auto-restart Minecraft server
 - 🔌 **Plugin System** - Custom plugin extensions with single-plugin management
 - 🌐 **HTTP API** - RESTful API for remote server control
-- 🤖 **QQ Bot** - OneBot11 protocol support for QQ group messaging
 - 📝 **Log Parsing** - Auto-parse player join, quit, message, and command events
 - 🔄 **Hot Reload** - Runtime plugin reloading
 
@@ -43,11 +42,6 @@ module.exports = {
         args: ["java", "-jar", "server.jar"],
         cwd: "./server",
         // ...
-    },
-    qqbot: {
-        server: "http://127.0.0.1:3000",
-        token: "your-qqbot-token",
-        groupIds: [123456789]
     }
 }
 ```
@@ -108,13 +102,13 @@ Create a `.js` file in the `plugins` directory. Plugins are auto-loaded on start
 | `plugin_registerCommand(expr, fn)` | Register custom command |
 | `plugin_onEvent(event, fn)` | Listen to event |
 | `plugin_triggerEvent(event, ...args)` | Trigger custom event |
-| `plugin_sendQQMessage(text)` | Send QQ group message |
 | `plugin_log(type, message)` | Log output (INFO/WARN/ERROR) |
 | `plugin_generateOfflineUUID(name)` | Generate offline UUID |
 | `plugin_registerApi(method, path, fn)` | Register HTTP endpoint |
 | `plugin_push(key, value)` | Store global data |
 | `plugin_pull(key)` | Retrieve global data |
 | `plugin_getPluginsList()` | Get plugin lists `{loaded, unloaded, all}` |
+| `plugin_sendQQMessage(text)` | ~~Deprecated since v1.1.0~~ No longer functional |
 
 ### Native Events
 

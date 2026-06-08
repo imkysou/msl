@@ -33,7 +33,7 @@ plugin_registerCommand("!online", (player) => {
     plugin_executeCommand("list", (lines) => {
         lines.forEach(line => {
             if (line.includes("players online")) {
-                plugin_sendQQMessage(`Online players: ${line}`);
+                plugin_log("INFO", `Online players: ${line}`);
             }
         });
     });
