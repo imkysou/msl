@@ -67,7 +67,13 @@ function loadPlugin(pluginName) {
                 return id;
             },
             setInterval: (fn, interval, ...args) => {
-                const id = setInterval(fn, interval, ...args);
+                const id = setInterval(() => {
+                    try {
+                        fn(...args);
+                    } catch (err) {
+                        libs.plugin_log('ERROR', `setInterval callback error: ${err.message}`, pluginName);
+                    }
+                }, interval);
                 libs._addPluginTimer(pluginName, id);
                 return id;
             },
@@ -111,6 +117,12 @@ function unloadPlugin(pluginName) {
 }
 
 function loadAllPlugins() {
+    if (!fs.existsSync(pluginsDir)) {
+        fs.mkdirSync(pluginsDir, { recursive: true });
+        log('Plugins directory created');
+        return;
+    }
+
     const files = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'));
 
     files.forEach(file => {
@@ -144,6 +156,7 @@ function getLoadedPlugins() {
 }
 
 function getPluginsList() {
+    if (!fs.existsSync(pluginsDir)) return { loaded: [], unloaded: [], all: [] };
     const files = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'));
     const all = files.map(f => path.basename(f, '.js'));
     const loaded = all.filter(name => loadedPlugins.has(name));
@@ -152,6 +165,10 @@ function getPluginsList() {
 }
 
 function listPlugins() {
+    if (!fs.existsSync(pluginsDir)) {
+        log('Plugins directory does not exist');
+        return;
+    }
     const files = fs.readdirSync(pluginsDir).filter(f => f.endsWith('.js'));
     const allPlugins = files.map(f => path.basename(f, '.js'));
 

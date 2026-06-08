@@ -57,7 +57,7 @@ All `plugin_*` functions are injected into the plugin sandbox. Plugins do NOT ne
 | `plugin_require` | `(moduleName) => any` | Import Node.js module |
 | `plugin_executeCommand` | `(command, fn?) => void` | Execute MC command, optional callback for response |
 | `plugin_startServer` | `() => void` | Start Minecraft server |
-| `plugin_forceStopServer` | `() => void` | Force kill Minecraft server process (SIGKILL) |
+| `plugin_forceStopServer` | `() => void` | Force kill Minecraft server process (taskkill on Windows, SIGKILL on Linux) |
 | `plugin_registerCommand` | `(expression, fn) => void` | Register command: `"!ping"` or `"!ban <player> <reason>"` |
 | `plugin_onEvent` | `(eventName, fn) => void` | Listen to event |
 | `plugin_triggerEvent` | `(eventName, ...args) => void` | Trigger custom event |
