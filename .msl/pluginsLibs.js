@@ -1,6 +1,4 @@
 const crypto = require('crypto');
-const http = require('http');
-const https = require('https');
 const config = require('../config');
 
 const globalStore = {};
@@ -171,43 +169,7 @@ function matchCommand(prefix, playerName, content) {
 
 function plugin_sendQQMessage(text) {
     debugLog(`plugin_sendQQMessage('${text}')`);
-
-    const qqbot = config.qqbot;
-    const url = new URL(qqbot.server);
-    const isHttps = url.protocol === 'https:';
-    const requestLib = isHttps ? https : http;
-
-    const postData = JSON.stringify({
-        group_id: qqbot.groupIds[0],
-        message: text
-    });
-
-    const options = {
-        hostname: url.hostname,
-        port: url.port || (isHttps ? 443 : 80),
-        path: '/send_group_msg',
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(postData),
-            'Authorization': `Bearer ${qqbot.token}`
-        }
-    };
-
-    const req = requestLib.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => { data += chunk; });
-        res.on('end', () => {
-            debugLog(`QQ message response: ${data}`);
-        });
-    });
-
-    req.on('error', (err) => {
-        debugLog(`QQ message failed: ${err.message}`);
-    });
-
-    req.write(postData);
-    req.end();
+    plugin_log('WARN', 'plugin_sendQQMessage is deprecated since v1.1.0 and will be removed in a future version. This call has no effect.', 'MinecraftServerListener');
 }
 
 function clearPlugin(pluginName) {

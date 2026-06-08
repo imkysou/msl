@@ -16,8 +16,7 @@ module.exports = {
         ],
         cwd: "./server",
         autoRestart: {
-            enable: true,
-            sendQQBotMessage: true
+            enable: true
         },
         logRegexs: {
             playerJoin: /^\[(\d{2}:\d{2}:\d{2}) INFO\]: (\S+) joined the game$/,
@@ -25,11 +24,5 @@ module.exports = {
             playerSendMessage: /^\[(\d{2}:\d{2}:\d{2}) INFO\]: <(\S+)> (.+)$/,
             playerSendCommand: /^\[(\d{2}:\d{2}:\d{2}) INFO\]: (\S+) issued server command: \/(.+)$/
         }
-    },
-    qqbot: {
-        server: "http://127.0.0.1:3000",
-        token: "your-qqbot-token",
-        groupIds: [123456789],
-        autoRestartMessage: "Server auto-restarted at {time}"
     }
 }

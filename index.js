@@ -154,12 +154,6 @@ function startMinecraftServer() {
         if (!manualStop && config.minecraft.autoRestart.enable) {
             log('Auto restarting...');
 
-            if (config.minecraft.autoRestart.sendQQBotMessage && config.qqbot.groupIds.length > 0) {
-                const time = getTimestamp();
-                const message = config.qqbot.autoRestartMessage.replace('{time}', time);
-                libs.plugin_sendQQMessage(message);
-            }
-
             setTimeout(() => {
                 startMinecraftServer();
             }, 3000);
