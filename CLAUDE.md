@@ -77,6 +77,7 @@ All `plugin_*` functions are injected into the plugin sandbox. Plugins do NOT ne
 | `serverStart` | (none) | Server process started |
 | `serverStop` | (none) | Server process stopped |
 | `serverDone` | (none) | Server startup complete |
+| `pluginLoaded` | pluginName | A plugin has been loaded |
 | `playerJoin` | time, player | Player joined |
 | `playerQuit` | time, player | Player left |
 | `playerSendMessage` | time, player, message | Player sent chat message |

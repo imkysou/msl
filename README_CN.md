@@ -120,6 +120,7 @@ Content-Type: application/json
 | `serverStart` | (无) | 服务器进程启动 |
 | `serverStop` | (无) | 服务器进程退出 |
 | `serverDone` | (无) | 服务器启动完成 |
+| `pluginLoaded` | pluginName | 插件已加载 |
 | `playerJoin` | time, player | 玩家加入服务器 |
 | `playerQuit` | time, player | 玩家退出服务器 |
 | `playerSendMessage` | time, player, message | 玩家发送消息 |

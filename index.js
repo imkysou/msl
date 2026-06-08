@@ -31,7 +31,7 @@ function log(message) {
 
 const MSL_VERSION = fs.readFileSync(path.join(__dirname, '.msl', 'MSL_VERSION'), 'utf-8').trim();
 
-let commandResponseCapture = null;
+let commandResponseCaptures = [];
 
 libs._getPluginsList = pluginsLoader.getPluginsList;
 
@@ -41,7 +41,12 @@ libs.startServer = function() {
 
 libs.forceStopServer = function() {
     if (minecraftProcess) {
-        minecraftProcess.kill('SIGKILL');
+        manualStop = true;
+        if (process.platform === 'win32') {
+            spawn('taskkill', ['/T', '/F', '/PID', minecraftProcess.pid.toString()], { stdio: 'ignore' });
+        } else {
+            process.kill(-minecraftProcess.pid, 'SIGKILL');
+        }
         log('Minecraft server process force killed');
     }
 };
@@ -49,20 +54,22 @@ libs.forceStopServer = function() {
 libs.sendCommand = function(command, fn) {
     if (minecraftProcess && minecraftProcess.stdin.writable) {
         if (fn) {
-            commandResponseCapture = {
+            const capture = {
                 lines: [],
                 callback: fn,
                 timer: setTimeout(() => {
-                    if (commandResponseCapture) {
-                        try {
-                            commandResponseCapture.callback(commandResponseCapture.lines);
-                        } catch (err) {
-                            log(`Plugin command callback error: ${err.message}`);
-                        }
-                        commandResponseCapture = null;
+                    const idx = commandResponseCaptures.indexOf(capture);
+                    if (idx !== -1) {
+                        commandResponseCaptures.splice(idx, 1);
+                    }
+                    try {
+                        capture.callback(capture.lines);
+                    } catch (err) {
+                        log(`Plugin command callback error: ${err.message}`);
                     }
                 }, 500)
             };
+            commandResponseCaptures.push(capture);
         }
         minecraftProcess.stdin.write(command + '\n');
     }
@@ -134,7 +141,8 @@ function startMinecraftServer() {
     minecraftProcess = spawn(command, commandArgs, {
         stdio: ['pipe', 'pipe', 'pipe'],
         shell: true,
-        cwd: config.minecraft.cwd
+        cwd: config.minecraft.cwd,
+        detached: process.platform !== 'win32'
     });
 
     libs.plugin_triggerEvent('serverStart');
@@ -147,8 +155,10 @@ function startMinecraftServer() {
         logBuffer = lines.pop() || '';
 
         lines.forEach(line => {
-            if (commandResponseCapture) {
-                commandResponseCapture.lines.push(line.trim());
+            if (commandResponseCaptures.length > 0) {
+                commandResponseCaptures.forEach(capture => {
+                    capture.lines.push(line.trim());
+                });
             }
             if (line.trim()) {
                 parseLogLine(line.trim());
@@ -329,8 +339,17 @@ const server = http.createServer((req, res) => {
 
     if (req.method === 'POST' && req.url === '/execCommand') {
         let body = '';
+        let bodySize = 0;
+        const MAX_BODY_SIZE = 1024 * 1024; // 1MB
 
         req.on('data', (chunk) => {
+            bodySize += chunk.length;
+            if (bodySize > MAX_BODY_SIZE) {
+                req.destroy();
+                res.writeHead(413, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: 'Request body too large' }));
+                return;
+            }
             body += chunk.toString();
         });
 

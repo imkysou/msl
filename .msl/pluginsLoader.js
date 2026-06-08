@@ -25,6 +25,13 @@ function loadPlugin(pluginName) {
 
     const fileName = pluginName + '.js';
     const pluginPath = path.join(pluginsDir, fileName);
+    const resolvedPath = path.resolve(pluginPath);
+    const resolvedPluginsDir = path.resolve(pluginsDir);
+
+    if (!resolvedPath.startsWith(resolvedPluginsDir + path.sep) && resolvedPath !== resolvedPluginsDir) {
+        log(`Plugin '${pluginName}' invalid: path traversal detected`);
+        return;
+    }
 
     if (!fs.existsSync(pluginPath)) {
         log(`Plugin '${pluginName}' not found`);
