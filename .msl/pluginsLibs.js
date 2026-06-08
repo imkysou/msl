@@ -7,6 +7,7 @@ const globalStore = {};
 const eventListeners = {};
 const registeredCommands = [];
 const registeredApis = [];
+const pluginTimers = {};
 let debugEnabled = config.debug;
 
 function setDebug(value) {
@@ -226,6 +227,7 @@ function clearPlugin(pluginName) {
             registeredApis.splice(i, 1);
         }
     }
+    _clearPluginTimers(pluginName);
 }
 
 function clearAll() {
@@ -237,6 +239,9 @@ function clearAll() {
     for (const key in globalStore) {
         delete globalStore[key];
     }
+    for (const key in pluginTimers) {
+        _clearPluginTimers(key);
+    }
 }
 
 function plugin_getPluginsList() {
@@ -245,6 +250,31 @@ function plugin_getPluginsList() {
         return module.exports._getPluginsList();
     }
     return { loaded: [], unloaded: [], all: [] };
+}
+
+function _addPluginTimer(pluginName, id) {
+    if (!pluginTimers[pluginName]) {
+        pluginTimers[pluginName] = [];
+    }
+    pluginTimers[pluginName].push(id);
+}
+
+function _removePluginTimer(pluginName, id) {
+    if (pluginTimers[pluginName]) {
+        const idx = pluginTimers[pluginName].indexOf(id);
+        if (idx !== -1) {
+            pluginTimers[pluginName].splice(idx, 1);
+        }
+    }
+}
+
+function _clearPluginTimers(pluginName) {
+    if (pluginTimers[pluginName]) {
+        for (const id of pluginTimers[pluginName]) {
+            clearTimeout(id);
+        }
+        delete pluginTimers[pluginName];
+    }
 }
 
 module.exports = {
@@ -268,5 +298,8 @@ module.exports = {
     getRegisteredApis: () => registeredApis,
     getEventListeners: () => eventListeners,
     sendCommand: null,
-    _getPluginsList: null
+    _getPluginsList: null,
+    _addPluginTimer,
+    _removePluginTimer,
+    _clearPluginTimers
 };

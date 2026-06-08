@@ -49,6 +49,27 @@ function loadPlugin(pluginName) {
             plugin_log: (type, message) => libs.plugin_log(type, message, pluginName),
             plugin_sendQQMessage: libs.plugin_sendQQMessage,
             plugin_getPluginsList: libs.plugin_getPluginsList,
+            setTimeout: (fn, delay, ...args) => {
+                const id = setTimeout(() => {
+                    libs._removePluginTimer(pluginName, id);
+                    fn(...args);
+                }, delay);
+                libs._addPluginTimer(pluginName, id);
+                return id;
+            },
+            setInterval: (fn, interval, ...args) => {
+                const id = setInterval(fn, interval, ...args);
+                libs._addPluginTimer(pluginName, id);
+                return id;
+            },
+            clearTimeout: (id) => {
+                libs._removePluginTimer(pluginName, id);
+                clearTimeout(id);
+            },
+            clearInterval: (id) => {
+                libs._removePluginTimer(pluginName, id);
+                clearInterval(id);
+            },
             console: {
                 log: (...args) => libs.plugin_log('INFO', args.join(' '), pluginName),
                 warn: (...args) => libs.plugin_log('WARN', args.join(' '), pluginName),
