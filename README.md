@@ -77,16 +77,31 @@ Type the following commands in the Node.js console:
 
 ## HTTP API
 
+All HTTP endpoints require authentication via `Authorization` header:
+
+```
+Authorization: Bearer <your-api-token>
+```
+
 ### Execute Command
 
 ```http
 POST /execCommand
+Authorization: Bearer your-api-token
 Content-Type: application/json
 
 {
-    "token": "your-api-token",
     "command": "list"
 }
+```
+
+### Plugin API Endpoints
+
+All plugin-registered HTTP endpoints also require the same Bearer token authentication:
+
+```http
+GET /api/demo
+Authorization: Bearer your-api-token
 ```
 
 ## Plugin Development

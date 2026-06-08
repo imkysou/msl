@@ -311,10 +311,23 @@ process.stdin.on('data', (data) => {
     }
 });
 
+function verifyToken(req) {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return false;
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0] !== 'Bearer') return false;
+    return parts[1] === config.api.token;
+}
+
 function handlePluginApis(req, res) {
     const apis = libs.getRegisteredApis();
     for (const api of apis) {
         if (api.method === req.method && req.url === api.path) {
+            if (!verifyToken(req)) {
+                res.writeHead(401, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify({ success: false, error: 'Unauthorized: invalid or missing token' }));
+                return true;
+            }
             try {
                 api.fn(req, res);
             } catch (err) {
@@ -338,6 +351,12 @@ const server = http.createServer((req, res) => {
     if (handlePluginApis(req, res)) return;
 
     if (req.method === 'POST' && req.url === '/execCommand') {
+        if (!verifyToken(req)) {
+            res.writeHead(401, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ success: false, error: 'Unauthorized: invalid or missing token' }));
+            return;
+        }
+
         let body = '';
         let bodySize = 0;
         const MAX_BODY_SIZE = 1024 * 1024; // 1MB
@@ -356,12 +375,6 @@ const server = http.createServer((req, res) => {
         req.on('end', () => {
             try {
                 const data = JSON.parse(body);
-
-                if (!data.token || data.token !== config.api.token) {
-                    res.writeHead(401, { 'Content-Type': 'application/json' });
-                    res.end(JSON.stringify({ success: false, error: 'Invalid token' }));
-                    return;
-                }
 
                 if (!data.command) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });

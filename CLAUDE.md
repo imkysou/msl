@@ -119,3 +119,5 @@ Key sections:
 - `plugin_executeCommand` with callback captures 500ms of server response
 - `manualStop` flag prevents auto-restart when server is stopped via `msl stopmc`
 - `plugin_sendQQMessage` is deprecated since v1.1.0 and will be removed in a future version
+- All HTTP endpoints (including `/execCommand` and plugin APIs) require `Authorization: Bearer <token>` header for authentication
+- Token is configured in `config.api.token`

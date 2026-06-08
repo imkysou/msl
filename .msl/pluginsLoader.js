@@ -61,7 +61,11 @@ function loadPlugin(pluginName) {
             setTimeout: (fn, delay, ...args) => {
                 const id = setTimeout(() => {
                     libs._removePluginTimer(pluginName, id);
-                    fn(...args);
+                    try {
+                        fn(...args);
+                    } catch (err) {
+                        libs.plugin_log('ERROR', `setTimeout callback error: ${err.message}`, pluginName);
+                    }
                 }, delay);
                 libs._addPluginTimer(pluginName, id);
                 return id;

@@ -77,16 +77,31 @@ node index.js
 
 ## HTTP API
 
+所有 HTTP 接口均需通过 `Authorization` 请求头进行身份验证：
+
+```
+Authorization: Bearer <your-api-token>
+```
+
 ### 执行指令
 
 ```http
 POST /execCommand
+Authorization: Bearer your-api-token
 Content-Type: application/json
 
 {
-    "token": "your-api-token",
     "command": "list"
 }
+```
+
+### 插件 API 接口
+
+所有插件注册的 HTTP 接口同样需要 Bearer Token 鉴权：
+
+```http
+GET /api/demo
+Authorization: Bearer your-api-token
 ```
 
 ## 插件开发
