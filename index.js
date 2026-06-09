@@ -135,6 +135,35 @@ function startMinecraftServer() {
         return arg;
     });
 
+    // 检测是否有 -jar 参数，自动添加推荐的JVM参数
+    const jarIndex = parsedArgs.indexOf('-jar');
+    if (jarIndex > 0) {
+        const autoParams = [];
+        const paramPrefixes = [
+            '-Djline.terminal=',
+            '-Dterminal.ansi=',
+            '-Dlog4j.configurationFile='
+        ];
+        const autoParamValues = [
+            '-Djline.terminal=jline.AnsiTerminal',
+            '-Dterminal.ansi=true',
+            '-Dlog4j.configurationFile=log4j2.xml'
+        ];
+
+        // 检查用户是否已配置这些参数
+        for (let i = 0; i < paramPrefixes.length; i++) {
+            const hasParam = parsedArgs.some(arg => arg.startsWith(paramPrefixes[i]));
+            if (!hasParam) {
+                autoParams.push(autoParamValues[i]);
+            }
+        }
+
+        // 在 -jar 前插入自动参数
+        if (autoParams.length > 0) {
+            parsedArgs.splice(jarIndex, 0, ...autoParams);
+        }
+    }
+
     const command = parsedArgs[0];
     const commandArgs = parsedArgs.slice(1);
 
